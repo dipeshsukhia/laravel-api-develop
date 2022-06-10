@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Resources\Macros;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\ResponseFactory;
+
+$response = $this->app->make(ResponseFactory::class);
+if (!$response->hasMacro('apiJson')) {
+    $response->macro('apiJson', function (array $args = [], int $status = 200) use ($response): JsonResponse {
+        extract($args);
+        if (!($success ?? true)) {
+            $errors = $errors ?? ($message ?? null);
+        }
+        return $response->json([
+            'data' => $data ?? [],
+            'success' => $success ?? true,
+            'message' => $message ?? null,
+            'meta' => $meta ?? null,
+            'errors' => $errors ?? null,
+        ], $status);
+    });
+}

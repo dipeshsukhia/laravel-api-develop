@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Exceptions\Traits;
+
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
+trait ApiHandlerTrait
+{
+    /**
+     * @param $request
+     * @param ValidationException $exception
+     * @return JsonResponse
+     */
+    protected function invalidJson($request, ValidationException $exception): JsonResponse
+    {
+        return response()->apiJson([
+            'success' => false,
+            'message' => $exception->getMessage(),
+            'errors' => $exception->errors()
+        ], $exception->status);
+    }
+
+    /**
+     * @param $request
+     * @param Throwable $e
+     * @return JsonResponse|Response|\Symfony\Component\HttpFoundation\Response
+     * @throws Throwable
+     */
+    public function render($request, Throwable $e)
+    {
+        if ($request->wantsJson()) {
+            return $this->handleApiException($request, $e);
+        }
+        return parent::render($request, $e);
+    }
+
+    /**
+     * @param $request
+     * @param Throwable $exception
+     * @return JsonResponse
+     */
+    private function handleApiException($request, Throwable $exception): JsonResponse
+    {
+        $exception = $this->prepareException($exception);
+
+        if ($exception instanceof HttpResponseException) {
+            $exception = $exception->getResponse();
+        } else if ($exception instanceof AuthenticationException) {
+            $exception = $this->unauthenticated($request, $exception);
+        } else if ($exception instanceof ValidationException) {
+            $exception = $this->convertValidationExceptionToResponse($exception, $request);
+        }
+
+        return $this->customApiResponse($exception);
+    }
+
+    /**
+     * @param $exception
+     * @return JsonResponse
+     */
+    private function customApiResponse($exception): JsonResponse
+    {
+        $statusCode = method_exists($exception, 'getStatusCode')
+            ? $exception->getStatusCode()
+            : 500;
+        $response = [];
+        switch ($statusCode) {
+            case 401:
+                $message = 'Unauthorized';
+                break;
+            case 403:
+                $message = 'Forbidden';
+                break;
+            case 404:
+                $message = 'Not Found';
+                break;
+            case 405:
+                $message = 'Method Not Allowed';
+                break;
+            case 422:
+                $message = $exception->original['message'];
+                $errors = $exception->original['errors'];
+                break;
+            default:
+                $message = ($statusCode === 500 && config('app.debug')) ? $exception->getMessage() : 'Whoops, looks like something went wrong';
+                break;
+        }
+
+        if (config('app.debug')) {
+            $response['trace'] = method_exists($exception, 'getTrace')
+                ? $exception->getTrace()
+                : null;
+            $response['code'] = method_exists($exception, 'code')
+                ? $exception->code()
+                : null;
+        }
+
+        return response()->apiJson([
+            'message' => $message,
+            'success' => false,
+            'errors' => $errors ?? $message,
+            'meta' => $response
+        ], $statusCode);
+    }
+}

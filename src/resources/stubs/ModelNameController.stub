@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Controllers\Api\{{version}};
+
+use App\Http\Controllers\Api\ApiController;
+use App\{{modelNameSpace}};
+use Illuminate\Http\Request;
+use App\Http\Requests\Store{{modelName}}Request;
+use App\Http\Requests\Update{{modelName}}Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Resources\Resource\{{modelName}}Resource;
+use App\Http\Resources\Collection\{{modelName}}Collection;
+
+class {{modelName}}Controller extends ApiController
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return {{modelName}}Collection
+     */
+    public function index(Request $request): {{modelName}}Collection
+    {
+        ${{modelNameCamel}}List = {{modelName}}::paginate($request->get('page_limit', 10));
+        return new {{modelName}}Collection(${{modelNameCamel}}List);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Store{{modelName}}Request $request
+     * @return {{modelName}}Resource
+     */
+    public function store(Store{{modelName}}Request $request): {{modelName}}Resource
+    {
+        $requestData = $request->all();
+        ${{modelNameCamel}} = {{modelName}}::create($requestData);
+        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage('Created!');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return {{modelName}}Resource
+     */
+    public function show({{modelName}} ${{modelNameCamel}}): {{modelName}}Resource
+    {
+        return new {{modelName}}Resource(${{modelNameCamel}});
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Update{{modelName}}Request $request
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return {{modelName}}Resource
+     */
+    public function update(Update{{modelName}}Request $request, {{modelName}} ${{modelNameCamel}}): {{modelName}}Resource
+    {
+        $requestData = $request->all();
+        ${{modelNameCamel}}->update($requestData);
+        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage('Updated!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param {{modelName}} ${{modelNameCamel}}
+     * @return JsonResponse
+     */
+    public function destroy({{modelName}} ${{modelNameCamel}}): JsonResponse
+    {
+        ${{modelNameCamel}}->delete();
+        return response()->apiJson([
+            'message' => 'Deleted!'
+        ]);
+    }
+}
