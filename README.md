@@ -1,4 +1,4 @@
-# Very short description of the package
+# Develop(Export) Laravel REST apis
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/dipeshsukhia/laravel-api-develop.svg?style=flat-square)](https://packagist.org/packages/dipeshsukhia/laravel-api-develop)
 [![Total Downloads](https://img.shields.io/packagist/dt/dipeshsukhia/laravel-api-develop.svg?style=flat-square)](https://packagist.org/packages/dipeshsukhia/laravel-api-develop)
@@ -17,7 +17,17 @@ composer require dipeshsukhia/laravel-api-develop
 ## Usage
 
 ```php
-// Usage description here
+php artisan develop-api:install
+```
+use trait in App\Exceptions\Handler.php
+
+```php
+use App\Exceptions\Traits\ApiHandlerTrait;
+use ApiHandlerTrait;
+```
+
+```php
+php artisan develop-api --model=User
 ```
 
 ### Testing
