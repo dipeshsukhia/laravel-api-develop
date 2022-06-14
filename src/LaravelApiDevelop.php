@@ -108,7 +108,8 @@ class LaravelApiDevelop
         $version = config('laravel-api-develop.version');
         $this->result = false;
         if (app()->version() >= 8) {
-            $nameSpace = "\nuse App\Http\Controllers\Api\{$version}\{{modelName}}Controller;";
+            $template = "\nuse App\Http\Controllers\Api\{{version}}\{{modelName}}Controller;";
+            $nameSpace = str_replace('{{version}}', $version, $template);
             $template = "Route::apiResource('{{modelNameLower}}', {{modelName}}Controller::class);\n";
             $nameSpace = str_replace('{{modelName}}', $this->model, $nameSpace);
         } else {
