@@ -23,11 +23,24 @@ class LaravelApiDevelop
 
     public function directoryCreate()
     {
-        if (!file_exists(base_path('app/Http/Controllers/Api'))) {
-            mkdir(base_path('app/Http/Controllers/Api'));
+        $version = Str::camel(config('laravel-api-develop.version'));
+        if (!file_exists(app_path('Http/Controllers/Api'))) {
+            mkdir(app_path('Http/Controllers/Api'));
         }
-        if (!file_exists(base_path('app/Http/Resources'))) {
-            mkdir(base_path('app/Http/Resources'));
+        if (!is_dir(app_path('Http/Controllers/Api/'.$version))) {
+            mkdir(app_path('Http/Controllers/Api/'.$version));
+        }
+        if (!file_exists(app_path('Http/Resources'))) {
+            mkdir(app_path('Http/Resources'));
+        }
+        if (!is_dir(app_path('Http/Resources/Resource'))) {
+            mkdir(app_path('Http/Resources/Resource'));
+        }
+        if (!is_dir(app_path('Http/Resources/Collection'))) {
+            mkdir(app_path('Http/Resources/Collection'));
+        }
+        if (!is_dir(app_path('Http/Requests'))) {
+            mkdir(app_path('Http/Requests'));
         }
     }
 
@@ -36,19 +49,16 @@ class LaravelApiDevelop
      */
     public function generateController(): bool
     {
-        $version = config('laravel-api-develop.version');
-        if (!is_dir(app_path('Http/Controllers/Api/'.$version))) {
-            mkdir(app_path('Http/Controllers/Api/'.$version));
-        }
+        $version = Str::camel(config('laravel-api-develop.version'));
         $this->result = false;
-        if (!file_exists(base_path('app/Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'))) {
+        if (!file_exists(app_path('Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'))) {
             $template = self::getStubContents('ModelNameController.stub');
             $template = str_replace('{{version}}', $version, $template);
             $template = str_replace('{{modelName}}', $this->model, $template);
             $template = str_replace('{{modelNameLower}}', strtolower($this->model), $template);
             $template = str_replace('{{modelNameCamel}}', Str::camel($this->model), $template);
-            $template = str_replace('{{modelNameSpace}}', is_dir(base_path('app/Models')) ? 'Models\\' . $this->model : $this->model, $template);
-            file_put_contents(base_path('app/Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'), $template);
+            $template = str_replace('{{modelNameSpace}}', is_dir(app_path('Models')) ? 'Models\\' . $this->model : $this->model, $template);
+            file_put_contents(app_path('Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'), $template);
             $this->result = true;
         }
         return $this->result;
@@ -60,11 +70,8 @@ class LaravelApiDevelop
     public function generateResource(): bool
     {
         $this->result = false;
-        if (!is_dir(app_path('Http/Resources/Resource'))) {
-            mkdir(app_path('Http/Resources/Resource'));
-        }
         if (!file_exists(app_path('Http/Resources/Resource/' . $this->model . 'Resource.php'))) {
-            $model = is_dir(base_path('app/Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
+            $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
             $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
             $print_columns = null;
             foreach ($columns as $key => $column) {
@@ -73,7 +80,7 @@ class LaravelApiDevelop
             $template = self::getStubContents('ModelNameResource.stub');
             $template = str_replace('{{modelName}}', $this->model, $template);
             $template = str_replace('{{columns}}', $print_columns, $template);
-            file_put_contents(base_path('app/Http/Resources/Resource/' . $this->model . 'Resource.php'), $template);
+            file_put_contents(app_path('Http/Resources/Resource/' . $this->model . 'Resource.php'), $template);
             $this->result = true;
         }
 
@@ -86,11 +93,8 @@ class LaravelApiDevelop
     public function generateStoreRequest(): bool
     {
         $this->result = false;
-        if (!is_dir(app_path('Http/Requests'))) {
-            mkdir(app_path('Http/Requests'));
-        }
         if (!file_exists(app_path('Http/Requests/Store' . $this->model . 'Request.php'))) {
-            $model = is_dir(base_path('app/Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
+            $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
             $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
             $print_columns = null;
             foreach ($columns as $key => $column) {
@@ -99,7 +103,7 @@ class LaravelApiDevelop
             $template = self::getStubContents('StoreModelNameRequest.stub');
             $template = str_replace('{{modelName}}', $this->model, $template);
             $template = str_replace('{{columns}}', $print_columns, $template);
-            file_put_contents(base_path('app/Http/Requests/Store' . $this->model . 'Request.php'), $template);
+            file_put_contents(app_path('Http/Requests/Store' . $this->model . 'Request.php'), $template);
             $this->result = true;
         }
 
@@ -112,11 +116,8 @@ class LaravelApiDevelop
     public function generateUpdateRequest(): bool
     {
         $this->result = false;
-        if (!is_dir(app_path('Http/Requests'))) {
-            mkdir(app_path('Http/Requests'));
-        }
         if (!file_exists(app_path('Http/Requests/Update' . $this->model . 'Request.php'))) {
-            $model = is_dir(base_path('app/Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
+            $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
             $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
             $print_columns = null;
             foreach ($columns as $key => $column) {
@@ -125,7 +126,7 @@ class LaravelApiDevelop
             $template = self::getStubContents('UpdateModelNameRequest.stub');
             $template = str_replace('{{modelName}}', $this->model, $template);
             $template = str_replace('{{columns}}', $print_columns, $template);
-            file_put_contents(base_path('app/Http/Requests/Update' . $this->model . 'Request.php'), $template);
+            file_put_contents(app_path('Http/Requests/Update' . $this->model . 'Request.php'), $template);
             $this->result = true;
         }
 
@@ -138,13 +139,10 @@ class LaravelApiDevelop
     public function generateCollection(): bool
     {
         $this->result = false;
-        if (!is_dir(app_path('Http/Resources/Collection'))) {
-            mkdir(app_path('Http/Resources/Collection'));
-        }
-        if (!file_exists(base_path('app/Http/Resources/Collection/' . $this->model . 'Collection.php'))) {
+        if (!file_exists(app_path('Http/Resources/Collection/' . $this->model . 'Collection.php'))) {
             $template = self::getStubContents('ModelNameCollection.stub');
             $template = str_replace('{{modelName}}', $this->model, $template);
-            file_put_contents(base_path('app/Http/Resources/Collection/' . $this->model . 'Collection.php'), $template);
+            file_put_contents(app_path('Http/Resources/Collection/' . $this->model . 'Collection.php'), $template);
             $this->result = true;
         }
 
@@ -156,7 +154,7 @@ class LaravelApiDevelop
      */
     public function generateRoute(): bool
     {
-        $version = config('laravel-api-develop.version');
+        $version = Str::camel(config('laravel-api-develop.version'));
         $this->result = false;
         if (app()->version() >= 8) {
             $template = "\nuse App\Http\Controllers\Api\{{version}}\{{modelName}}Controller;";
