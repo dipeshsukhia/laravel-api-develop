@@ -31,7 +31,7 @@ trait ApiResourceTrait
     public function with($request): array
     {
         if (is_null($this->message) && !$this->count()) {
-            $this->setMessage('There are no data available.');
+            $this->setMessage( __('message.no_data') );
         }
         return [
             'success' => true,
@@ -44,11 +44,11 @@ trait ApiResourceTrait
     /**
      * Retrieve a value when key Exists.
      *
-     * @param $key
+     * @param string $key
      * @param mixed $default
      * @return MissingValue|mixed
      */
-    protected function whenExists($key, $default = null)
+    protected function whenExists(string $key, $default = null)
     {
         if (array_key_exists($key,$this->getAttributes())) {
             return value($this->{$key});
@@ -59,11 +59,11 @@ trait ApiResourceTrait
     /**
      * Retrieve a manipulated value when key Exists.
      *
-     * @param $key
+     * @param string $key
      * @param $value
      * @return MissingValue|mixed
      */
-    protected function whenExistsThan($key, $value)
+    protected function whenExistsThan(string $key, $value)
     {
         if (array_key_exists($key,$this->getAttributes())) {
             return value($value);

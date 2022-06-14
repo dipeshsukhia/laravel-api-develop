@@ -15,7 +15,7 @@ class ApiController extends BaseController
     {
         return response()->apiJson([
             'success' => false,
-            'message' => 'Method '.$method.' does not exist',
+            'message' => __('message.method_404', compact('method')),
         ], 404);
     }
 }

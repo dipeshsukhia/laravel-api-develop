@@ -1,0 +1,18 @@
+<?php
+/*
+|--------------------------------------------------------------------------
+| Api Language Lines
+|--------------------------------------------------------------------------
+|
+| The following language lines are used during api for various
+| messages that we need to display to the user. You are free to modify
+| these language lines according to your application's requirements.
+|
+*/
+return [
+    'create' => ':model successfully Created!!',
+    'update' => ':model successfully Updated!!',
+    'delete' => ':model successfully Deleted!!',
+    'no_data' => 'There are no data available!!',
+    'method_404' => 'Method :method does not exist!!',
+];

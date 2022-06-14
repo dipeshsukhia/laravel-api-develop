@@ -13,13 +13,13 @@ class LaravelApiDevelopServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/resources/stubs/ApiController.stub' => app_path('Http/Controllers/Api/ApiController.php'),
                 __DIR__ . '/resources/stubs/ApiHandlerTrait.stub' => app_path('Exceptions/Traits/ApiHandlerTrait.php'),
                 __DIR__ . '/resources/stubs/ApiJson.stub' => app_path('Http/Resources/Macros/ApiJson.php'),
                 __DIR__ . '/resources/stubs/ApiResourceTrait.stub' => app_path('Http/Resources/Traits/ApiResourceTrait.php'),
+                __DIR__ . '/resources/stubs/message.stub' => resource_path('lang/en/message.php'),
                 __DIR__.'/../config/config.php' => config_path('laravel-api-develop.php'),
             ], 'LaravelApiDevelop');
             // Registering package commands.
@@ -37,6 +37,10 @@ class LaravelApiDevelopServiceProvider extends ServiceProvider
     {
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-api-develop');
+
+        if(file_exists(app_path('Http/Resources/Macros/ApiJson.php'))){
+            require app_path('Http/Resources/Macros/ApiJson.php');
+        }
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-api-develop', function () {

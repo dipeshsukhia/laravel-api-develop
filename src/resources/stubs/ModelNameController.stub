@@ -35,7 +35,7 @@ class {{modelName}}Controller extends ApiController
     {
         $requestData = $request->all();
         ${{modelNameCamel}} = {{modelName}}::create($requestData);
-        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage('Created!');
+        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage( __('message.create', ['model' => '{{modelName}}' ]) );
     }
 
     /**
@@ -60,7 +60,7 @@ class {{modelName}}Controller extends ApiController
     {
         $requestData = $request->all();
         ${{modelNameCamel}}->update($requestData);
-        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage('Updated!');
+        return (new {{modelName}}Resource(${{modelNameCamel}}))->setMessage( __('message.update', ['model' => '{{modelName}}' ]) );
     }
 
     /**
@@ -73,7 +73,7 @@ class {{modelName}}Controller extends ApiController
     {
         ${{modelNameCamel}}->delete();
         return response()->apiJson([
-            'message' => 'Deleted!'
+            'message' => __('message.delete', ['model' => '{{modelName}}' ])
         ]);
     }
 }
