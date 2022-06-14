@@ -2,6 +2,7 @@
 
 namespace Dipeshsukhia\LaravelApiDevelop;
 
+use Dipeshsukhia\LaravelApiDevelop\Console\Commands\DevelopApi;
 use Dipeshsukhia\LaravelApiDevelop\Console\Commands\ExportLaravelApiDevelopDefaults;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,6 +24,7 @@ class LaravelApiDevelopServiceProvider extends ServiceProvider
             ], 'LaravelApiDevelop');
             // Registering package commands.
             $this->commands([
+                DevelopApi::class,
                 ExportLaravelApiDevelopDefaults::class,
             ]);
         }
