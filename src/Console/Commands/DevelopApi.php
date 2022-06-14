@@ -62,13 +62,26 @@ class DevelopApi extends Command
             $this->error('Resource Already Exists!');
         }
 
+        $resource = $api->generateStoreRequest();
+        if ($resource) {
+            $this->info('Store Request Generated SuccessFully!');
+        } else {
+            $this->error('Store Request Already Exists!');
+        }
+
+        $resource = $api->generateUpdateRequest();
+        if ($resource) {
+            $this->info('Update Request Generated SuccessFully!');
+        } else {
+            $this->error('Update Request Already Exists!');
+        }
+
         $collection = $api->generateCollection();
         if ($collection) {
             $this->info('Collection Generated SuccessFully!');
         } else {
             $this->error('Collection Already Exists!');
         }
-        $this->info('Api Created SuccessFully!');
 
         $route = $api->generateRoute();
         if ($route) {
@@ -77,6 +90,7 @@ class DevelopApi extends Command
             $this->error('Route Already Exists!');
         }
 
+        $this->info('Api Created SuccessFully!');
         return true;
     }
 }

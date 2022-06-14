@@ -72,9 +72,60 @@ class LaravelApiDevelop
             }
             $template = self::getStubContents('ModelNameResource.stub');
             $template = str_replace('{{modelName}}', $this->model, $template);
-            $template = str_replace('{{modelName}}', $this->model, $template);
             $template = str_replace('{{columns}}', $print_columns, $template);
             file_put_contents(base_path('app/Http/Resources/Resource/' . $this->model . 'Resource.php'), $template);
+            $this->result = true;
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function generateStoreRequest(): bool
+    {
+        $this->result = false;
+        if (!is_dir(app_path('Http/Requests'))) {
+            mkdir(app_path('Http/Requests'));
+        }
+        if (!file_exists(app_path('Http/Requests/Store' . $this->model . 'Request.php'))) {
+            $model = is_dir(base_path('app/Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
+            $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $print_columns = null;
+            foreach ($columns as $key => $column) {
+                $print_columns .= "'" . $column . "'" . " => 'required', " . "\n \t\t\t";
+            }
+            $template = self::getStubContents('StoreModelNameRequest.stub');
+            $template = str_replace('{{modelName}}', $this->model, $template);
+            $template = str_replace('{{columns}}', $print_columns, $template);
+            file_put_contents(base_path('app/Http/Requests/Store' . $this->model . 'Request.php'), $template);
+            $this->result = true;
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function generateUpdateRequest(): bool
+    {
+        $this->result = false;
+        if (!is_dir(app_path('Http/Requests'))) {
+            mkdir(app_path('Http/Requests'));
+        }
+        if (!file_exists(app_path('Http/Requests/Update' . $this->model . 'Request.php'))) {
+            $model = is_dir(base_path('app/Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
+            $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $print_columns = null;
+            foreach ($columns as $key => $column) {
+                $print_columns .= "'" . $column . "'" . " => 'required', " . "\n \t\t\t";
+            }
+            $template = self::getStubContents('UpdateModelNameRequest.stub');
+            $template = str_replace('{{modelName}}', $this->model, $template);
+            $template = str_replace('{{columns}}', $print_columns, $template);
+            file_put_contents(base_path('app/Http/Requests/Update' . $this->model . 'Request.php'), $template);
             $this->result = true;
         }
 

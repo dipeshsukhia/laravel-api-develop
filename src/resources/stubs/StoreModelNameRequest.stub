@@ -24,7 +24,9 @@ class Store{{modelName}}Request extends FormRequest
     public function rules(): array
     {
         return [
+            /*
             {{columns}}
+            */
         ];
     }
 }
