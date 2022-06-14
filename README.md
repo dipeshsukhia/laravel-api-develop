@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/dipeshsukhia/laravel-api-develop.svg?style=flat-square)](https://packagist.org/packages/dipeshsukhia/laravel-api-develop)
 ![GitHub Actions](https://github.com/dipeshsukhia/laravel-api-develop/actions/workflows/main.yml/badge.svg)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+Develop(Export) Laravel REST apis with form request, api resources  and collections.
 
 ## Installation
 
