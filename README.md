@@ -23,7 +23,10 @@ use trait in App\Exceptions\Handler.php
 
 ```php
 use App\Exceptions\Traits\ApiHandlerTrait;
-use ApiHandlerTrait;
+
+class Handler extends ExceptionHandler
+{
+    use ApiHandlerTrait;
 ```
 
 ```php
