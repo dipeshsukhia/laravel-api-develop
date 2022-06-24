@@ -9,6 +9,7 @@ class LaravelApiDevelop
     const STUB_DIR = __DIR__ . '/resources/stubs/';
     protected $model;
     protected $result = false;
+    protected $version = '';
 
     public function __construct(string $model)
     {
@@ -19,16 +20,16 @@ class LaravelApiDevelop
     public function generate()
     {
         self::directoryCreate();
+        $this->version = Str::ucfirst(Str::camel(config('laravel-api-develop.version')));
     }
 
     public function directoryCreate()
     {
-        $version = Str::camel(config('laravel-api-develop.version'));
         if (!file_exists(app_path('Http/Controllers/Api'))) {
             mkdir(app_path('Http/Controllers/Api'));
         }
-        if (!is_dir(app_path('Http/Controllers/Api/'.$version))) {
-            mkdir(app_path('Http/Controllers/Api/'.$version));
+        if (!is_dir(app_path('Http/Controllers/Api/' . $this->version))) {
+            mkdir(app_path('Http/Controllers/Api/' . $this->version));
         }
         if (!file_exists(app_path('Http/Resources'))) {
             mkdir(app_path('Http/Resources'));
@@ -49,16 +50,22 @@ class LaravelApiDevelop
      */
     public function generateController(): bool
     {
-        $version = Str::camel(config('laravel-api-develop.version'));
         $this->result = false;
-        if (!file_exists(app_path('Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'))) {
-            $template = self::getStubContents('ModelNameController.stub');
-            $template = str_replace('{{version}}', $version, $template);
-            $template = str_replace('{{modelName}}', $this->model, $template);
-            $template = str_replace('{{modelNameLower}}', strtolower($this->model), $template);
-            $template = str_replace('{{modelNameCamel}}', Str::camel($this->model), $template);
-            $template = str_replace('{{modelNameSpace}}', is_dir(app_path('Models')) ? 'Models\\' . $this->model : $this->model, $template);
-            file_put_contents(app_path('Http/Controllers/Api/' . $version . '/' . $this->model . 'Controller.php'), $template);
+        if (!file_exists(app_path('Http/Controllers/Api/' . $this->version . '/' . $this->model . 'Controller.php'))) {
+            $template = str_replace([
+                '{{version}}',
+                '{{modelName}}',
+                '{{modelNameLower}}',
+                '{{modelNameCamel}}',
+                '{{modelNameSpace}}'
+            ], [
+                $this->version,
+                $this->model,
+                strtolower($this->model),
+                Str::camel($this->model),
+                is_dir(app_path('Models')) ? 'Models\\' . $this->model : $this->model
+            ], self::getStubContents('ModelNameController.stub'));
+            file_put_contents(app_path('Http/Controllers/Api/' . $this->version . '/' . $this->model . 'Controller.php'), $template);
             $this->result = true;
         }
         return $this->result;
@@ -72,18 +79,21 @@ class LaravelApiDevelop
         $this->result = false;
         if (!file_exists(app_path('Http/Resources/Resource/' . $this->model . 'Resource.php'))) {
             $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
-            $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
-            $print_columns = null;
-            foreach ($columns as $key => $column) {
-                $print_columns .= "'" . $column . "'" . ' => $this->whenExists("' . $column . '"), ' . "\n \t\t\t";
-            }
-            $template = self::getStubContents('ModelNameResource.stub');
-            $template = str_replace('{{modelName}}', $this->model, $template);
-            $template = str_replace('{{columns}}', $print_columns, $template);
+
+            $print_columns = implode("\n \t\t\t", array_map(function ($column) {
+                return "'" . $column . "'" . ' => $this->whenExists("' . $column . '"), ';
+            }, $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable())));
+
+            $template = str_replace([
+                '{{modelName}}',
+                '{{columns}}'
+            ], [
+                $this->model,
+                $print_columns
+            ], self::getStubContents('ModelNameResource.stub'));
             file_put_contents(app_path('Http/Resources/Resource/' . $this->model . 'Resource.php'), $template);
             $this->result = true;
         }
-
         return $this->result;
     }
 
@@ -95,18 +105,21 @@ class LaravelApiDevelop
         $this->result = false;
         if (!file_exists(app_path('Http/Requests/Store' . $this->model . 'Request.php'))) {
             $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
-            $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
-            $print_columns = null;
-            foreach ($columns as $key => $column) {
-                $print_columns .= "'" . $column . "'" . " => 'required', " . "\n \t\t\t";
-            }
-            $template = self::getStubContents('StoreModelNameRequest.stub');
-            $template = str_replace('{{modelName}}', $this->model, $template);
-            $template = str_replace('{{columns}}', $print_columns, $template);
+
+            $print_columns = implode("\n \t\t\t", array_map(function ($column) {
+                return "'" . $column . "'" . " => 'required', ";
+            }, $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable())));
+
+            $template = str_replace([
+                '{{modelName}}',
+                '{{columns}}'
+            ], [
+                $this->model,
+                $print_columns
+            ], self::getStubContents('StoreModelNameRequest.stub'));
             file_put_contents(app_path('Http/Requests/Store' . $this->model . 'Request.php'), $template);
             $this->result = true;
         }
-
         return $this->result;
     }
 
@@ -118,18 +131,21 @@ class LaravelApiDevelop
         $this->result = false;
         if (!file_exists(app_path('Http/Requests/Update' . $this->model . 'Request.php'))) {
             $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
-            $columns = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
-            $print_columns = null;
-            foreach ($columns as $key => $column) {
-                $print_columns .= "'" . $column . "'" . " => 'required', " . "\n \t\t\t";
-            }
-            $template = self::getStubContents('UpdateModelNameRequest.stub');
-            $template = str_replace('{{modelName}}', $this->model, $template);
-            $template = str_replace('{{columns}}', $print_columns, $template);
+
+            $print_columns = implode("\n \t\t\t", array_map(function ($column) {
+                return "'" . $column . "'" . " => 'required', ";
+            }, $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable())));
+
+            $template = str_replace([
+                '{{modelName}}',
+                '{{columns}}'
+            ], [
+                $this->model,
+                $print_columns
+            ], self::getStubContents('UpdateModelNameRequest.stub'));
             file_put_contents(app_path('Http/Requests/Update' . $this->model . 'Request.php'), $template);
             $this->result = true;
         }
-
         return $this->result;
     }
 
@@ -140,12 +156,10 @@ class LaravelApiDevelop
     {
         $this->result = false;
         if (!file_exists(app_path('Http/Resources/Collection/' . $this->model . 'Collection.php'))) {
-            $template = self::getStubContents('ModelNameCollection.stub');
-            $template = str_replace('{{modelName}}', $this->model, $template);
+            $template = str_replace('{{modelName}}', $this->model, self::getStubContents('ModelNameCollection.stub'));
             file_put_contents(app_path('Http/Resources/Collection/' . $this->model . 'Collection.php'), $template);
             $this->result = true;
         }
-
         return $this->result;
     }
 
@@ -154,18 +168,28 @@ class LaravelApiDevelop
      */
     public function generateRoute(): bool
     {
-        $version = Str::camel(config('laravel-api-develop.version'));
         $this->result = false;
         if (app()->version() >= 8) {
-            $template = "\nuse App\Http\Controllers\Api\{{version}}\{{modelName}}Controller;";
-            $nameSpace = str_replace('{{version}}', $version, $template);
-            $template = "Route::apiResource('{{modelNameLower}}', {{modelName}}Controller::class);\n";
-            $nameSpace = str_replace('{{modelName}}', $this->model, $nameSpace);
+            $nameSpaceTemplate = "use App\Http\Controllers\Api\{{version}}\{{modelName}}Controller;";
+            $nameSpace = str_replace([
+                '{{version}}',
+                '{{modelName}}'
+            ], [
+                $this->version,
+                $this->model
+            ], $nameSpaceTemplate);
+            $routeTemplate = "Route::apiResource('{{modelNameLower}}', {{modelName}}Controller::class);\n";
         } else {
-            $template = "Route::apiResource('{{modelNameLower}}', 'Api\'.$version.'\{{modelName}}Controller');\n";
+            $routeTemplate = "Route::apiResource('{{modelNameLower}}', 'Api\'.$this->version.'\{{modelName}}Controller');\n";
         }
-        $route = str_replace('{{modelNameLower}}', Str::camel(Str::plural($this->model)), $template);
-        $route = str_replace('{{modelName}}', $this->model, $route);
+        $route = str_replace([
+            '{{modelNameLower}}',
+            '{{modelName}}'
+        ], [
+            Str::camel(Str::plural($this->model)),
+            $this->model
+        ], $routeTemplate);
+
         if (!strpos(file_get_contents(base_path('routes/api.php')), $route)) {
             file_put_contents(base_path('routes/api.php'), $route, FILE_APPEND);
             if (app()->version() >= 8) {
@@ -177,7 +201,6 @@ class LaravelApiDevelop
             }
             $this->result = true;
         }
-
         return $this->result;
     }
 
