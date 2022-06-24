@@ -79,8 +79,8 @@ trait ApiHandlerTrait
         }
         return response()->apiJson([
             'success' => false,
-            'message' => Response::$statusTexts[$statusCode],
-            'errors' => $errors ?? Response::$statusTexts[$statusCode],
+            'message' => $exception->original['message'] ?? Response::$statusTexts[$statusCode],
+            'errors' => $exception->original['errors'] ?? Response::$statusTexts[$statusCode],
             'meta' => $response
         ], $statusCode);
     }
