@@ -19,8 +19,8 @@ class LaravelApiDevelop
 
     public function generate()
     {
-        self::directoryCreate();
         $this->version = Str::ucfirst(Str::camel(config('laravel-api-develop.version')));
+        self::directoryCreate();        
     }
 
     public function directoryCreate()
