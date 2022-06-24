@@ -67,30 +67,8 @@ trait ApiHandlerTrait
     {
         $statusCode = method_exists($exception, 'getStatusCode')
             ? $exception->getStatusCode()
-            : 500;
+            : Response::HTTP_INTERNAL_SERVER_ERROR;
         $response = [];
-        switch ($statusCode) {
-            case 401:
-                $message = 'Unauthorized';
-                break;
-            case 403:
-                $message = 'Forbidden';
-                break;
-            case 404:
-                $message = 'Not Found';
-                break;
-            case 405:
-                $message = 'Method Not Allowed';
-                break;
-            case 422:
-                $message = $exception->original['message'];
-                $errors = $exception->original['errors'];
-                break;
-            default:
-                $message = ($statusCode === 500 && config('app.debug')) ? $exception->getMessage() : 'Whoops, looks like something went wrong';
-                break;
-        }
-
         if (config('app.debug')) {
             $response['trace'] = method_exists($exception, 'getTrace')
                 ? $exception->getTrace()
@@ -99,11 +77,10 @@ trait ApiHandlerTrait
                 ? $exception->code()
                 : null;
         }
-
         return response()->apiJson([
-            'message' => $message,
             'success' => false,
-            'errors' => $errors ?? $message,
+            'message' => Response::$statusTexts[$statusCode],
+            'errors' => $errors ?? Response::$statusTexts[$statusCode],
             'meta' => $response
         ], $statusCode);
     }
