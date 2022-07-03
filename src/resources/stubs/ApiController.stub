@@ -18,4 +18,15 @@ class ApiController extends BaseController
             'message' => __('message.method_404', compact('method')),
         ], 404);
     }
+    
+    /**
+     * @param int|null $default
+     * @return int
+     */
+    public function perPage(?int $default = null): int
+    {
+        return is_numeric($default)
+            ? $default
+            : request('per_page', config('laravel-api-develop.per_page'));
+    }
 }
