@@ -5,5 +5,5 @@
  */
 return [
     'version' => 'V1',
-    'page_limit' => 10
+    'per_page' => 10
 ];
