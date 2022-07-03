@@ -107,7 +107,7 @@ class LaravelApiDevelop
             $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
 
             $print_columns = implode("\n \t\t\t", array_map(function ($column) {
-                return "'" . $column . "'" . " => 'required', ";
+                return "'" . $column . "'" . " => 'sometimes', ";
             }, $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable())));
 
             $template = str_replace([
@@ -133,7 +133,7 @@ class LaravelApiDevelop
             $model = is_dir(app_path('Models')) ? app('App\\Models\\' . $this->model) : app('App\\' . $this->model);
 
             $print_columns = implode("\n \t\t\t", array_map(function ($column) {
-                return "'" . $column . "'" . " => 'required', ";
+                return "'" . $column . "'" . " => 'sometimes', ";
             }, $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable())));
 
             $template = str_replace([
