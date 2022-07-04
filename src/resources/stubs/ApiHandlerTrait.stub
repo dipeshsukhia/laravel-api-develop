@@ -43,6 +43,7 @@ trait ApiHandlerTrait
      * @param $request
      * @param Throwable $exception
      * @return JsonResponse
+     * @throws Throwable
      */
     private function handleApiException($request, Throwable $exception): JsonResponse
     {
@@ -53,7 +54,7 @@ trait ApiHandlerTrait
         } else if ($exception instanceof AuthenticationException) {
             $exception = $this->unauthenticated($request, $exception);
         } else if ($exception instanceof ValidationException) {
-            $exception = $this->convertValidationExceptionToResponse($exception, $request);
+            return parent::render($request, $exception);
         }
 
         return $this->customApiResponse($exception);
@@ -76,11 +77,17 @@ trait ApiHandlerTrait
             $response['code'] = method_exists($exception, 'code')
                 ? $exception->code()
                 : null;
+            $message = method_exists($exception, 'getMessage')
+                ? $exception->getMessage()
+                : null;
+            $errors = method_exists($exception, 'getErrors')
+                ? $exception->errors()
+                : null;
         }
         return response()->apiJson([
             'success' => false,
-            'message' => $exception->original['message'] ?? Response::$statusTexts[$statusCode],
-            'errors' => $exception->original['errors'] ?? Response::$statusTexts[$statusCode],
+            'message' => $message ?? Response::$statusTexts[$statusCode],
+            'errors' => $errors ?? Response::$statusTexts[$statusCode],
             'meta' => $response
         ], $statusCode);
     }
