@@ -16,8 +16,8 @@ if (!$response->hasMacro('apiJson')) {
             'data' => $data ?? [],
             'success' => $success ?? true,
             'message' => $message ?? null,
-            'meta' => $meta ?? null,
             'errors' => $errors ?? null,
+            'meta' => $meta ?? null
         ], $status);
     });
 }
